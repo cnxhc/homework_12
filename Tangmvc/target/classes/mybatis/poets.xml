@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jkxy.dao.QueryDao">
+	<resultMap type="Poets" id="ByPoetMap">
+		<id property="id" column="poets.id"/>
+		<result property="name" column="name"/>
+		<result property="created_at" column="created_at"/>
+		<result property="updated_at" column="updated_at"/>
+		<collection  property="poetries" column="poet_id" 
+		javaType="ArrayList" ofType="com.jkxy.entity.Poetries">
+			<id property="id" column="poetries.id"/>
+			<result property="poet_id" column="poet_id"/>
+			<result property="content" column="content"/>
+			<result property="title" column="title"/>
+			<result property="created_at" column="created_at"/>
+			<result property="updated_at" column="updated_at"/>
+		</collection>
+	</resultMap>
+	<select id="selectByPoet" resultMap="ByPoetMap">
+		select poets.name,poetries.title from poets inner join poetries where poets.id=poetries.poet_id and poets.name=#{0} limit #{1},#{2}
+	</select>
+	<select id="selectByTitle" resultMap="ByPoetMap">
+		select poets.name,poetries.content,poetries.title from poets inner join poetries  where poets.id=poetries.poet_id  and poetries.title=#{title} 
+	</select>
+	<select id="selectByContent" resultMap="ByPoetMap">
+		select poets.name,poetries.content,poetries.title from poets inner join poetries  where poets.id=poetries.poet_id  and poetries.content like CONCAT('%',#{content},'%') limit 0,15 
+	</select>
+	<select id="getRowCountByPoet" resultType="int">
+		SELECT COUNT(title) FROM poetries WHERE poetries.poet_id=(SELECT id FROM  poets WHERE poets.name=#{name} );
+	</select>
+	
+</mapper>
